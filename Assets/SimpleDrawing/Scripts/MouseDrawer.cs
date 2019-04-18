@@ -13,8 +13,8 @@ namespace SimpleDrawing
         [SerializeField]
         bool erase = false;
 
+        Vector2 defaultTexCoord = Vector2.zero;
         Vector2 previousTexCoord;
-        bool previousMouseDown;
 
         void Update()
         {
@@ -47,12 +47,15 @@ namespace SimpleDrawing
                         Debug.LogWarning("If you want to draw using a RaycastHit, need set MeshCollider for object.");
                     }
                 }
+                else
+                {
+                    previousTexCoord = defaultTexCoord;
+                }
             }
             else if (!mouseDown) // Mouse is released
             {
-                previousTexCoord = Vector2.zero;
+                previousTexCoord = defaultTexCoord;
             }
-            previousMouseDown = mouseDown;
         }
     }
 }

@@ -7,7 +7,9 @@ namespace SimpleDrawing
     public class DrawableCanvas : MonoBehaviour
     {
         public bool ResetCanvasOnPlay = true;
-        public Color ResetColor = new Color(1, 1, 1, 1);  
+        public Color ResetColor = new Color(1, 1, 1, 1);
+
+        Vector2 defaultTexCoord = Vector2.zero;
 
         Texture2D drawableTexture;
         Color32[] currentPixels;
@@ -51,7 +53,7 @@ namespace SimpleDrawing
             previousPixelPos.x *= drawableTexture.width;
             previousPixelPos.y *= drawableTexture.height;
 
-            if (previousTexCoord == Vector2.zero)
+            if (previousTexCoord == defaultTexCoord)
             {
                 // If this is the first time we've ever dragged on this image, 
                 // simply color the pixels at our mouse position.
