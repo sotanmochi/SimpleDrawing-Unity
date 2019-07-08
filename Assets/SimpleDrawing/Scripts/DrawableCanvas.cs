@@ -100,34 +100,40 @@ namespace SimpleDrawing
             int width = drawableTexture.width;
             int height = drawableTexture.height;
 
-            Vector2 a = new Vector2((int)startPixelPos.x, (int)startPixelPos.y);
-            Vector2 b = new Vector2((int)endPixelPos.x, (int)endPixelPos.y);
+            Vector2 a = new Vector2(startPixelPos.x, startPixelPos.y);
+            Vector2 b = new Vector2(endPixelPos.x, endPixelPos.y);
 
-            int dx = (b.x - a.x) > 0 ? 1 : -1;
-            int dy = (b.y - a.y) > 0 ? 1 : -1;
             // *********************
             //  CPU implementation
             // *********************
+            Vector2 p = Vector2.zero;
             for (int py = 0; py < height; py++)
-            // for (int py = (int)a.y; py != (int)b.y; py += dy)
             {
                 for (int px = 0; px < width; px++)
-                // for (int px = (int)a.x; px != (int)b.x; px += dx)
                 {
+                    p.x = px; p.y = py;
+
+                    // *******************************************
+                    //  Projection of the point p to the line AB
+                    // *******************************************
+                    float dot1 = Vector2.Dot(p-a, b-a);
+                    float dot2 = Vector2.Dot(b-a, b-a);
+                    Vector2 q = dot1/dot2 * (b-a) + a;
+
                     // *********************************************************
                     //  Solve a system of linear equations using Cramer's rule
                     //  The system of linear equations:
-                    //    px = s*ax + t*bx
-                    //    py = s*ay + t*by
+                    //    qx = s*ax + t*bx
+                    //    qy = s*ay + t*by
                     //    Unknowns: s,t
                     // *********************************************************
                     float determinant = a.x*b.y - b.x*a.y;
                     if (!Mathf.Approximately(determinant, 0.0f))
                     {
-                        float s = (px*b.y - b.x*py) / determinant;
-                        float t = (a.x*py - px*a.y) / determinant;
+                        float s = (q.x*b.y - b.x*q.y) / determinant;
+                        float t = (a.x*q.y - q.x*a.y) / determinant;
 
-                        // Whether a point (px,py) is on the line segment AB.
+                        // Whether the point (px,py) is on the line segment AB.
                         if (GreaterThanEqualApproximately(s, 0.0f) &&
                             GreaterThanEqualApproximately(t, 0.0f) &&
                             Mathf.Approximately((s + t), 1.0f))
@@ -138,8 +144,7 @@ namespace SimpleDrawing
                                 d = 1.0f/d * Mathf.Abs((b.y - a.y)*px - (b.x - a.x)*py + (b.x*a.y - b.y*a.x));
                             }
 
-                            // if (d < 0.5f * Mathf.Sqrt(2.0f) )
-                            if (d < 1.0f )
+                            if (d < 0.5f * Mathf.Sqrt(2.0f))
                             {
                                 MarkPixelsToColor(new Vector2(px, py), thickness, color);
                             }
