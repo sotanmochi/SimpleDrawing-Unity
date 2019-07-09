@@ -7,7 +7,7 @@
 		[HideInInspector]
 		_Thickness ("Thickness", INT) = 1
 		[HideInInspector]
-		_Color ("Color", VECTOR) = (0,0,0,0)
+		_LineColor ("Color", VECTOR) = (0,0,0,0)
 		[HideInInspector]
 		_StartPositionUV ("Start UV Position", VECTOR) = (0,0,0,0)
 		[HideInInspector]
@@ -43,7 +43,7 @@
 
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
-            float4 _Color;
+            float4 _LineColor;
             int _Thickness;
             float4 _StartPositionUV;
             float4 _EndPositionUV;
@@ -60,8 +60,7 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = tex2D(_MainTex, i.uv);
-
+                fixed4 baseColor = tex2D(_MainTex, i.uv);
 
                 float4 texelSize = _MainTex_TexelSize;
                 float width = texelSize.z;
@@ -77,49 +76,49 @@
 
                 if (neighborOfStartPosition || neighborOfEndPosition)
                 {
-                    col = _Color;
+                    return _LineColor;
                 }
-
-                // *******************************************
-                //  Projection of the point p to the line AB
-                // *******************************************
-                float dot1 = dot(p-a, b-a);
-                float dot2 = dot(b-a, b-a);
-                float2 q = dot1/dot2 * (b-a) + a;
-
-                // *********************************************************
-                //  Solve a system of linear equations using Cramer's rule
-                //  The system of linear equations:
-                //    qx = s*ax + t*bx
-                //    qy = s*ay + t*by
-                //    Unknowns: s,t
-                // *********************************************************
-                float determinant = a.x*b.y - b.x*a.y;
-                if (!FloatApproximately(determinant, 0.0))
+                else
                 {
-                    float s = (q.x*b.y - b.x*q.y) / determinant;
-                    float t = (a.x*q.y - q.x*a.y) / determinant;
+                    // *******************************************
+                    //  Projection of the point P to the line AB
+                    // *******************************************
+                    float2 q = (dot(p-a, b-a)/dot(b-a, b-a)) * (b-a) + a;
 
-                    // Whether the point (px,py) is on the line segment AB.
-                    if (GreaterThanEqualApproximately(s, 0.0) &&
-                        GreaterThanEqualApproximately(t, 0.0) &&
-                        FloatApproximately((s + t), 1.0))
+                    // *********************************************************
+                    //  Solve a system of linear equations using Cramer's rule
+                    //  The system of linear equations:
+                    //    qx = s*ax + t*bx
+                    //    qy = s*ay + t*by
+                    //    Unknowns: s,t
+                    // *********************************************************
+                    float determinant = a.x*b.y - b.x*a.y;
+                    if (!FloatApproximately(determinant, 0.0))
                     {
-                        float d = sqrt((b.y - a.y)*(b.y - a.y) + (b.x - a.x)*(b.x - a.x));
-                        if (d > 0.0)
-                        {
-                            d = 1.0/d * abs((b.y - a.y)*p.x - (b.x - a.x)*p.y + (b.x*a.y - b.y*a.x));
-                        }
+                        float s = (q.x*b.y - b.x*q.y) / determinant;
+                        float t = (a.x*q.y - q.x*a.y) / determinant;
 
-                        if (d < radius)
+                        // Whether the projection of the point P is on the line segment AB
+                        if (GreaterThanEqualApproximately(s, 0.0) &&
+                            GreaterThanEqualApproximately(t, 0.0) &&
+                            FloatApproximately((s + t), 1.0))
                         {
-                            col = _Color;
+                            float dist = distance(a,b);
+                            if (dist > 0.0)
+                            {
+                                // Distance from the point P to the line AB
+                                dist = 1.0/dist * abs((b.y - a.y)*p.x - (b.x - a.x)*p.y + (b.x*a.y - b.y*a.x));
+
+                                if (dist < radius)
+                                {
+                                    return _LineColor;
+                                }
+                            }
                         }
                     }
                 }
 
-
-                return col;
+                return baseColor;
             }
             ENDCG
         }
