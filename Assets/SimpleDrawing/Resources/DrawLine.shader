@@ -50,7 +50,7 @@
 
             bool FloatApproximately(float a, float b)
             {
-                return abs(b - a) < (1.0e-6 * max(abs(a), abs(b)));
+                return abs(b - a) < (1.0e-3 * max(abs(a), abs(b)));
             }
 
             bool GreaterThanEqualApproximately(float a, float b)
@@ -70,6 +70,15 @@
                 float2 p = float2(i.uv.x * width, i.uv.y * height);
                 float2 a = float2(_StartPositionUV.x * width, _StartPositionUV.y * height);
                 float2 b = float2(_EndPositionUV.x * width, _EndPositionUV.y * height);
+
+                float radius = sqrt(2.0)*_Thickness;
+                bool neighborOfStartPosition = distance(p,a) < radius;
+                bool neighborOfEndPosition = distance(p,b) < radius;
+
+                if (neighborOfStartPosition || neighborOfEndPosition)
+                {
+                    col = _Color;
+                }
 
                 // *******************************************
                 //  Projection of the point p to the line AB
@@ -102,7 +111,7 @@
                             d = 1.0/d * abs((b.y - a.y)*p.x - (b.x - a.x)*p.y + (b.x*a.y - b.y*a.x));
                         }
 
-                        if (d < (0.5 * sqrt(2.0))*_Thickness)
+                        if (d < radius)
                         {
                             col = _Color;
                         }
