@@ -32,6 +32,7 @@ namespace SimpleDrawing
 
         Vector2 defaultTexCoord = Vector2.zero;
 
+        Vector2 currentTexCoord;
         Vector2 previousTexCoord;
 
 		void Start()
@@ -52,7 +53,8 @@ namespace SimpleDrawing
                         var drawObject = hitInfo.transform.GetComponent<DrawableCanvas>();
                         if (drawObject != null)
                         {
-                            Vector2 currentTexCoord = hitInfo.textureCoord;
+                            previousTexCoord = currentTexCoord;
+                            currentTexCoord = hitInfo.textureCoord;
                             if (erase)
                             {
                                 drawObject.Erase(currentTexCoord, previousTexCoord, penWidth);
@@ -61,7 +63,6 @@ namespace SimpleDrawing
                             {
                                 drawObject.Draw(currentTexCoord, previousTexCoord, penWidth, penColor);
                             }
-                            previousTexCoord = currentTexCoord;
                         }
                     }
                     else
@@ -71,12 +72,12 @@ namespace SimpleDrawing
                 }
                 else
                 {
-                    previousTexCoord = defaultTexCoord;
+                    currentTexCoord = defaultTexCoord;
                 }
             }
             else if (!RayCastEnabled)
             {
-                previousTexCoord = defaultTexCoord;
+                currentTexCoord = defaultTexCoord;
             }
         }
 
