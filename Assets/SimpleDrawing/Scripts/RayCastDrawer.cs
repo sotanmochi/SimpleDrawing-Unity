@@ -17,6 +17,7 @@ namespace SimpleDrawing
 
         public bool RayCastEnabled = true;
         public float RayDistance = 5.0f;
+        public float RayOffset = 2.5f;
 
         [SerializeField]
         RayDirectionType directionType = RayDirectionType.TransformDown;
@@ -44,7 +45,10 @@ namespace SimpleDrawing
         {
             if (RayCastEnabled)
             {
-                var ray = new Ray(this.transform.position, GetCurrentDirection());
+                Vector3 rayDir = GetCurrentDirection();
+                Vector3 rayOrigin = this.transform.position + rayDir * RayOffset;
+                var ray = new Ray(rayOrigin, rayDir);
+
                 RaycastHit hitInfo;
 				if(Physics.Raycast(ray, out hitInfo, RayDistance))
                 {
@@ -61,7 +65,9 @@ namespace SimpleDrawing
                             }
                             else
                             {
-                                drawObject.Draw(currentTexCoord, previousTexCoord, penWidth, penColor);
+                                float dist = Vector3.Distance(hitInfo.point, rayOrigin);
+                                float currentPenWidth = (RayDistance - dist) / RayDistance * penWidth;
+                                drawObject.Draw(currentTexCoord, previousTexCoord, (int)currentPenWidth, penColor);
                             }
                         }
                     }
