@@ -5,13 +5,15 @@
         [HideInInspector]
         _MainTex ("Texture", 2D) = "white" {}
 		[HideInInspector]
-		_Thickness ("Thickness", INT) = 1
-		[HideInInspector]
 		_LineColor ("Color", VECTOR) = (0,0,0,0)
 		[HideInInspector]
 		_StartPositionUV ("Start UV Position", VECTOR) = (0,0,0,0)
 		[HideInInspector]
+		_StartPointThickness ("Start Point Thickness", INT) = 1
+		[HideInInspector]
 		_EndPositionUV ("End UV Position", VECTOR) = (0,0,0,0)
+		[HideInInspector]
+		_EndPointThickness ("End Point Thickness", INT) = 1
     }
     SubShader
     {
@@ -44,9 +46,10 @@
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
             float4 _LineColor;
-            int _Thickness;
             float4 _StartPositionUV;
+            int _StartPointThickness;
             float4 _EndPositionUV;
+            int _EndPointThickness;
 
             bool FloatApproximately(float a, float b)
             {
@@ -71,8 +74,11 @@
                 float2 b = float2(_EndPositionUV.x * width, _EndPositionUV.y * height);
 
                 float radius = sqrt(2.0)*_Thickness;
-                bool neighborOfStartPosition = distance(p,a) < radius;
-                bool neighborOfEndPosition = distance(p,b) < radius;
+
+                float rs = sqrt(2.0) * _StartPointThickness;
+                float re = sqrt(2.0) * _EndPointThickness;
+                bool neighborOfStartPosition = distance(p,a) < rs;
+                bool neighborOfEndPosition = distance(p,b) < re;
 
                 if (neighborOfStartPosition || neighborOfEndPosition)
                 {
@@ -109,6 +115,7 @@
                                 // Distance from the point P to the line AB
                                 dist = 1.0/dist * abs((b.y - a.y)*p.x - (b.x - a.x)*p.y + (b.x*a.y - b.y*a.x));
 
+                                radius = (re - rs) * t + rs;
                                 if (dist < radius)
                                 {
                                     return _LineColor;

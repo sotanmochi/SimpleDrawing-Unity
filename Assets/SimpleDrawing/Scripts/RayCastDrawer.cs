@@ -34,6 +34,8 @@ namespace SimpleDrawing
         Vector2 currentTexCoord;
         Vector2 previousTexCoord;
 
+        int _PreviousPenWidth;
+
 		void Start()
 		{
 			GetComponent<MeshRenderer>().material.color = PenColor;
@@ -68,11 +70,12 @@ namespace SimpleDrawing
                                 {
                                     float currentPenWidth = (RayDistance - dist) / NibLength * PenWidth;
                                     currentPenWidth = Mathf.Clamp(currentPenWidth, 0.0f, PenWidth);
-                                    drawObject.Draw(currentTexCoord, previousTexCoord, (int)currentPenWidth, PenColor);
+                                    drawObject.Draw(currentTexCoord, (int)currentPenWidth, previousTexCoord, _PreviousPenWidth, PenColor);
+                                    _PreviousPenWidth = (int)currentPenWidth;
                                 }
                                 else
                                 {
-                                    drawObject.Draw(currentTexCoord, previousTexCoord, (int)PenWidth, PenColor);
+                                    drawObject.Draw(currentTexCoord, (int)PenWidth, previousTexCoord, (int)PenWidth, PenColor);
                                 }
                             }
                         }

@@ -37,7 +37,7 @@ namespace SimpleDrawing
                             }
                             else
                             {
-                                drawObject.Draw(currentTexCoord, previousTexCoord, penWidth, penColor);
+                                drawObject.Draw(currentTexCoord, penWidth, previousTexCoord, penWidth, penColor);
                             }
                             previousTexCoord = currentTexCoord;
                         }

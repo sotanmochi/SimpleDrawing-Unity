@@ -16,9 +16,10 @@ namespace SimpleDrawing
         #region ShaderPropertyID
 		private int mainTexturePropertyID;
 		private int lineColorPropertyID;
-		private int thicknessPropertyID;
 		private int startPositionUVPropertyID;
+		private int _StartPointThicknessPropertyID;
 		private int endPositionUVPropertyID;
+		private int _EndPointThicknessPropertyID;
 		private int singleColorPropertyID;
         #endregion
 
@@ -39,9 +40,10 @@ namespace SimpleDrawing
             // DrawLine.shader
 			mainTexturePropertyID = Shader.PropertyToID("_MainTex");
 			lineColorPropertyID = Shader.PropertyToID("_LineColor");
-			thicknessPropertyID = Shader.PropertyToID("_Thickness");
 			startPositionUVPropertyID = Shader.PropertyToID("_StartPositionUV");
+			_StartPointThicknessPropertyID = Shader.PropertyToID("_StartPointThickness");
 			endPositionUVPropertyID = Shader.PropertyToID("_EndPositionUV");
+			_EndPointThicknessPropertyID = Shader.PropertyToID("_EndPointThickness");
 
             // SingleColor.shader
             singleColorPropertyID = Shader.PropertyToID("_SingleColor");
@@ -63,9 +65,10 @@ namespace SimpleDrawing
             }
         }
 
-        public void Draw(Vector2 currentTexCoord, Vector2 previousTexCoord, int thickness, Color color)
+        public void Draw(Vector2 currentTexCoord, int currentThickness, Vector2 previousTexCoord, int previousThickness, Color color)
         {
-            drawLineMaterial.SetInt(thicknessPropertyID, thickness);
+            drawLineMaterial.SetInt(_StartPointThicknessPropertyID, previousThickness);
+            drawLineMaterial.SetInt(_EndPointThicknessPropertyID, currentThickness);
             drawLineMaterial.SetVector(lineColorPropertyID, color);
             drawLineMaterial.SetVector(startPositionUVPropertyID, previousTexCoord);
             drawLineMaterial.SetVector(endPositionUVPropertyID, currentTexCoord);
@@ -78,7 +81,7 @@ namespace SimpleDrawing
 
         public void Erase(Vector2 currentTexCoord, Vector2 previousTexCoord, int thickness)
         {
-            Draw(currentTexCoord, previousTexCoord, thickness, ResetColor);
+            Draw(currentTexCoord, thickness, previousTexCoord, thickness, ResetColor);
         }
 
         public void ResetCanvas()
