@@ -583,11 +583,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RayCastEnabled: 1
-  RayDistance: 5
+  VariableThickness: 1
+  Erase: 0
+  RayDistance: 2
+  RayOffset: 0
+  NibLength: 0.5
+  PenColor: {r: 0, g: 0.68235296, b: 0.9372549, a: 1}
+  PenWidth: 5
   directionType: 5
-  penColor: {r: 0, g: 0.6855712, b: 1, a: 1}
-  penWidth: 3
-  erase: 0
 --- !u!136 &2091719435
 CapsuleCollider:
   m_ObjectHideFlags: 0

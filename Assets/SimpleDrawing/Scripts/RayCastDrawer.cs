@@ -16,20 +16,18 @@ namespace SimpleDrawing
         }
 
         public bool RayCastEnabled = true;
-        public float RayDistance = 5.0f;
-        public float RayOffset = 2.5f;
+        public bool VariableThickness = true;
+        public bool Erase = false;
+
+        public float RayDistance = 2.0f;
+        public float RayOffset = 0.0f;
+        public float NibLength = 0.5f;
+
+        public Color PenColor = Color.black;
+        public int PenWidth = 5;
 
         [SerializeField]
         RayDirectionType directionType = RayDirectionType.TransformDown;
-
-        [SerializeField]
-        Color penColor = Color.cyan;
-
-        [SerializeField]
-        int penWidth = 3;
-
-        [SerializeField]
-        bool erase = false;
 
         Vector2 defaultTexCoord = Vector2.zero;
 
@@ -38,7 +36,7 @@ namespace SimpleDrawing
 
 		void Start()
 		{
-			GetComponent<MeshRenderer>().material.color = penColor;
+			GetComponent<MeshRenderer>().material.color = PenColor;
 		}
 
         void Update()
@@ -59,15 +57,23 @@ namespace SimpleDrawing
                         {
                             previousTexCoord = currentTexCoord;
                             currentTexCoord = hitInfo.textureCoord;
-                            if (erase)
+                            if (Erase)
                             {
-                                drawObject.Erase(currentTexCoord, previousTexCoord, penWidth);
+                                drawObject.Erase(currentTexCoord, previousTexCoord, PenWidth);
                             }
                             else
                             {
                                 float dist = Vector3.Distance(hitInfo.point, rayOrigin);
-                                float currentPenWidth = (RayDistance - dist) / RayDistance * penWidth;
-                                drawObject.Draw(currentTexCoord, previousTexCoord, (int)currentPenWidth, penColor);
+                                if (VariableThickness)
+                                {
+                                    float currentPenWidth = (RayDistance - dist) / NibLength * PenWidth;
+                                    currentPenWidth = Mathf.Clamp(currentPenWidth, 0.0f, PenWidth);
+                                    drawObject.Draw(currentTexCoord, previousTexCoord, (int)currentPenWidth, PenColor);
+                                }
+                                else
+                                {
+                                    drawObject.Draw(currentTexCoord, previousTexCoord, (int)PenWidth, PenColor);
+                                }
                             }
                         }
                     }
